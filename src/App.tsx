@@ -1,15 +1,12 @@
-//import { createPost, updatePost, deletePost } from './graphql/mutations';
-import React, { useState } from "react";
-import { PostWithoutContent, usePostsListWithoutContent } from "queries";
+import React from "react";
+import { Main } from "pages";
 
-function App() {
-  const [posts, setPosts] = useState<PostWithoutContent[] | null>(null);
-
-  usePostsListWithoutContent({
-    onSuccess: (posts) => setPosts(posts),
-  });
-
-  return <div className="App">{JSON.stringify(posts)}</div>;
-}
+const App: React.FC = () => {
+  return (
+    <>
+      <Main />
+    </>
+  );
+};
 
 export default App;

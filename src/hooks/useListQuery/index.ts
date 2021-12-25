@@ -1,56 +1,64 @@
 import { API, graphqlOperation } from "aws-amplify";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
-export interface ListQueryType<Entity> {
-  [key: string]:
-    | {
-        __typename: string;
-        nextToken?: string | null;
-        items: Array<Entity | null>;
-      }
-    | null
-    | undefined;
-}
-
-export interface UseListQueryCallbacks<Entity> {
-  onSuccess?: (response: Entity[]) => void;
-  onSuccessFullQuery?: (response: ListQueryType<Entity>) => void;
-  onEmpty?: () => void;
-  //TODO: implement more data usage on failure failure
-  onFailure?: () => void;
-}
+/**
+ * accepts optional callbacks and returns states
+ */
 
 export function useListQuery<Entity>(
   query: string,
-  {
-    onSuccess,
-    onSuccessFullQuery,
-    onEmpty,
-    onFailure,
-  }: UseListQueryCallbacks<Entity>,
+  callbacks?: Partial<QueryCallbacks<Entity>>,
   deps?: React.DependencyList
-) {
+): QueryHookResponse<Entity> {
+  const { onEmpty, onSuccess, onFailure, onLoadFinished } = callbacks || {};
+
+  const [loading, setLoading] = useState<boolean>(true);
+
+  const [response, setResponse] = useState<Pick<
+    QueryHookResponse<Entity>,
+    "items" | "meta" | "error"
+  > | null>(null);
+
   useEffect(() => {
     (async () => {
-      const fetchedPosts = (await API.graphql(graphqlOperation(query))) as {
-        data: ListQueryType<Entity>;
-      };
+      try {
+        const fetchedPosts = (await API.graphql(graphqlOperation(query))) as {
+          data: ListQueryType<Entity>;
+        };
 
-      if (!fetchedPosts || !fetchedPosts.data) {
+        if (!fetchedPosts || !fetchedPosts.data) throw new Error("no data");
+
+        //I should check if this is always true
+        const queryName = Object.keys(fetchedPosts.data)[0];
+
+        if (!("items" in fetchedPosts.data[queryName]!)) {
+          onEmpty && onEmpty();
+          setResponse({ ...response, items: [], meta: null });
+          return;
+        }
+
+        const items = fetchedPosts.data[queryName]!.items as Entity[];
+
+        const { __typename, nextToken } = fetchedPosts.data[queryName]!;
+
+        console.log(fetchedPosts.data);
+
+        const meta = { __typename, nextToken };
+
+        onSuccess && onSuccess({ items, meta });
+
+        setResponse({ items, meta });
+      } catch {
         onFailure && onFailure();
-        return;
+        setResponse({
+          error: "unhandled exception in useListQuery",
+        });
+      } finally {
+        onLoadFinished && onLoadFinished();
+        setLoading(false);
       }
-
-      //I should check if this is always true
-      const queryName = Object.keys(fetchedPosts.data)[0];
-
-      if (!("items" in fetchedPosts.data[queryName]!)) {
-        onEmpty && onEmpty();
-        return;
-      }
-
-      onSuccess && onSuccess(fetchedPosts.data[queryName]!.items as Entity[]);
-      onSuccessFullQuery && onSuccessFullQuery(fetchedPosts.data);
     })();
   }, deps || []);
+
+  return { ...response, loading };
 }
