@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "serviceConfiguration": {
+    "apiName": "blog",
+    "serviceName": "AppSync",
+    "gqlSchemaPath": "/home/modulariz/Projects/Blog/amplify/backend/api/blog/schema.graphql",
+    "defaultAuthType": {
+      "mode": "API_KEY",
+      "expirationTime": 7
+    }
+  }
+}
