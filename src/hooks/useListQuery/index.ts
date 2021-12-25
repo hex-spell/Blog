@@ -13,16 +13,21 @@ export interface ListQueryType<Entity> {
 }
 
 export interface UseListQueryCallbacks<Entity> {
-    onSuccess?: (response: Entity[]) => void;
-    onSuccessFullQuery?: (response: ListQueryType<Entity>) => void;
-    onEmpty?: () => void;
-    //TODO: implement more data usage on failure failure
-    onFailure?: () => void;
-  }
+  onSuccess?: (response: Entity[]) => void;
+  onSuccessFullQuery?: (response: ListQueryType<Entity>) => void;
+  onEmpty?: () => void;
+  //TODO: implement more data usage on failure failure
+  onFailure?: () => void;
+}
 
 export function useListQuery<Entity>(
   query: string,
-  { onSuccess, onSuccessFullQuery, onEmpty, onFailure }: UseListQueryCallbacks<Entity>,
+  {
+    onSuccess,
+    onSuccessFullQuery,
+    onEmpty,
+    onFailure,
+  }: UseListQueryCallbacks<Entity>,
   deps?: React.DependencyList
 ) {
   useEffect(() => {
