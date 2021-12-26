@@ -4,20 +4,54 @@ import App from "App";
 import reportWebVitals from "reportWebVitals";
 import Amplify from "aws-amplify";
 import config from "aws-exports";
-import { createGlobalStyle } from "styled-components";
+import { createGlobalStyle, keyframes } from "styled-components";
+import wave from "img/wave.png";
+import wave2 from "img/wave2.png";
+import clouds from "img/clouds.png";
 
 Amplify.configure(config);
 
+const cloudMovement = keyframes`
+  0% {
+    background-position: 50% -15%, 50% 30%, bottom left, bottom right;
+  }
+  50% {
+    background-position: -50000% -15%, -50000% 30%, bottom left, bottom right;
+  }
+  100% {
+    background-position: 50000% -15%, 50000% 30%, bottom left, bottom right;
+  }
+`
+
 const GlobalStyle = createGlobalStyle`
+  html {
+    padding: 0px;
+    margin: 0px;
+  }
   body {
+    margin: 0px;
+    padding: 0px;
+    max-width: 100vw;
     background-size: cover;
     image-rendering: crisp-edges;
     background-repeat: no-repeat;
     min-height: 100vh;
     color: white;
     font-family: 'Press Start 2P';
-    background: linear-gradient(to top, rgba(0,0,255,1), #ffc0fd);
+    background: url(${clouds}),url(${clouds}),url(${wave}),url(${wave2}),linear-gradient(to bottom,#f79263 -40%, #da79e7 50%, #6262fd);
+    background-position: 50% -15%, 50% 30%, bottom left, bottom right;
+    background-attachment: fixed, fixed,fixed, fixed, fixed;
+    background-repeat: repeat-x, repeat-x, no-repeat, no-repeat, no-repeat; 
+    background-size: auto 40vh, auto 20vh, auto 40vh, auto 40vh, 100% 100%;
+    animation: ${cloudMovement} 60000s infinite linear;
+    @media (max-width:500px) {
+      background: url(${clouds}),url(${clouds}),url(${wave}),linear-gradient(to bottom,#f79263 -40%, #da79e7 50%, #6262fd) !important;
+      background-position: 50% -15%, 50% 30%, left 100% !important;
+      background-repeat: repeat-x, repeat-x, no-repeat, no-repeat !important;
+      background-size: auto 40vh, auto 20vh, auto 35vh, 100% 100% !important;
+      background-attachment: fixed, fixed,fixed, fixed !important;
     }
+  }
 `;
 
 ReactDOM.render(
@@ -27,20 +61,6 @@ ReactDOM.render(
       url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
     </style>
     <GlobalStyle />
-    <svg
-      style={{ position: "fixed", maxHeight: "100%" }}
-      viewBox="0 0 1 1"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <filter id="noiseFilter">
-        <feTurbulence
-          type="fractalNoise"
-          baseFrequency="0.4"
-          numOctaves="1"
-          stitchTiles="stitch"
-        />
-      </filter>
-    </svg>
     <App />
   </React.StrictMode>,
   document.getElementById("root")

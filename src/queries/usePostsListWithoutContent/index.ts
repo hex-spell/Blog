@@ -1,6 +1,5 @@
 import { Post } from "API";
 import { useListQuery } from "hooks";
-import { useState } from "react";
 
 // I should find a way to make these two together, without repetition
 
@@ -11,7 +10,9 @@ export type PostWithoutContent = Pick<
 >;
 
 // 2. query for graphql
-export const usePostsListWithoutContent = () =>
+export const usePostsListWithoutContent = (
+  config?: QueryHookConfig<PostWithoutContent>
+) =>
   useListQuery<PostWithoutContent>(
     `{
     listPosts {
@@ -27,5 +28,6 @@ export const usePostsListWithoutContent = () =>
   `,
     {
       s3Dirs: ["image"],
+      ...config,
     }
   );

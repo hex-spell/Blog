@@ -1,21 +1,21 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { usePostsListWithoutContent } from "queries";
-import { Storage } from "aws-amplify";
-import { Card, Container, Description, Title } from "components";
+import { Container, Article } from "components";
 
 export const Main: React.FC = () => {
-  const { loading, error, items } = usePostsListWithoutContent();
+  const { items } = usePostsListWithoutContent();
   return (
     <Container>
       {items &&
-        items.map(({ title, createdAt, description, image }) => (
-          <div style={{ marginBottom: "30px" }}>
-            <Card>
-              <Title>{title}</Title>
-              <Description>{description}</Description>
-              {image && <img src={image} />}
-            </Card>
-          </div>
+        items.map(({ title, description, image, createdAt }, index) => (
+          <Article
+            title={title}
+            description={description}
+            imageSrc={image}
+            inverted={index % 2 !== 0}
+            key={index}
+            createdAt={createdAt}
+          />
         ))}
     </Container>
   );

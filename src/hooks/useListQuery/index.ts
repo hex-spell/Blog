@@ -1,7 +1,31 @@
-import { rejects } from "assert";
 import { API, graphqlOperation, Storage } from "aws-amplify";
 import { clog } from "helpers";
 import { useEffect, useState } from "react";
+
+async function resolveStorage<Entity>(
+  items: Entity[],
+  fields: (keyof Entity)[]
+): Promise<Entity[]> {
+  const promises = items.map(
+    (item) =>
+      new Promise((resolve) => {
+        Promise.all(
+          fields
+            .filter((dir) => Boolean(item[dir]))
+            .map(
+              (key) =>
+                new Promise((resolve) => {
+                  const dir = item[key] as unknown as string;
+                  Storage.get(dir).then((value) => resolve([key, value]));
+                })
+            )
+        ).then((keyValuePairs: any) =>
+          resolve({ ...item, ...Object.fromEntries(keyValuePairs) } as Entity)
+        );
+      })
+  );
+  return (await Promise.all(promises)) as Entity[];
+}
 
 export function useListQuery<Entity>(
   query: string,
@@ -13,6 +37,8 @@ export function useListQuery<Entity>(
     items: [],
   });
 
+  const { deps, logging, s3Dirs, nextToken } = config!;
+
   useEffect(() => {
     (async () => {
       let response = hookResponse;
@@ -21,7 +47,7 @@ export function useListQuery<Entity>(
           data: ListQueryType<Entity>;
         };
 
-        clog(fetchedPosts, config?.logging);
+        clog(fetchedPosts, logging);
 
         if (!fetchedPosts || !fetchedPosts.data) throw new Error("no data");
 
@@ -37,30 +63,15 @@ export function useListQuery<Entity>(
 
         response = { ...response, items };
 
+        if (typeof nextToken !== "undefined") {
+          response = { ...response, nextToken: fetchedPosts.data.nextToken };
+        }
         //change graphql field from s3 file dir to s3 link
-        if (config?.s3Dirs) {
-          const itemsStorageResolved: Promise<Entity>[] = items.map(
-            (item) =>
-              new Promise((resolve) => {
-                Promise.all(
-                  config!
-                    .s3Dirs!.filter((dir) => Boolean(item[dir]))
-                    .map(
-                      (key) =>
-                        new Promise((resolve) => {
-                          const dir = item[key] as unknown as string;
-                          Storage.get(dir).then((value) =>
-                            resolve([key, value])
-                          );
-                        })
-                    )
-                ).then((keyValuePairs: any) =>
-                  resolve({ ...item, ...Object.fromEntries(keyValuePairs) })
-                );
-              })
-          );
-          const resolved = await Promise.all(itemsStorageResolved);
-          response = { ...response, items: resolved };
+        if (s3Dirs) {
+          response = {
+            ...response,
+            items: await resolveStorage(items, s3Dirs),
+          };
         }
       } catch (err) {
         response = {
@@ -68,13 +79,13 @@ export function useListQuery<Entity>(
           items: [],
           error: "unhandled exception in useListQuery",
         };
-        clog(err, config?.logging);
+        clog(err, logging);
       } finally {
-        clog(response, config?.logging);
+        clog(response, logging);
         setResponse({ ...response, loading: false });
       }
     })();
-  }, config?.deps || []);
+  }, [...(deps || []), logging, s3Dirs, query]);
 
   return hookResponse;
 }
