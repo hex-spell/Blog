@@ -10,6 +10,7 @@ export const onCreatePost = /* GraphQL */ `
       description
       content
       image
+      type
       createdAt
       updatedAt
       owner
@@ -24,6 +25,7 @@ export const onUpdatePost = /* GraphQL */ `
       description
       content
       image
+      type
       createdAt
       updatedAt
       owner
@@ -38,6 +40,7 @@ export const onDeletePost = /* GraphQL */ `
       description
       content
       image
+      type
       createdAt
       updatedAt
       owner

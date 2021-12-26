@@ -11,4 +11,6 @@ type Post
   description: String
   content: String
   image: String
+  type: String! @index(name: "postsByDate", queryField: "postsByDate", sortKeyFields: ["createdAt"])
+  createdAt: String!
 }

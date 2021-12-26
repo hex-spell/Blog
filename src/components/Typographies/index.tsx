@@ -9,6 +9,12 @@ export const Title = styled.h1`
     margin-top: 10px;
     margin-bottom: 5px;
   }
+  @media (min-width: 1750px) {
+    font-size: 2rem;
+    line-height: 2.5rem;
+    margin-top: 15px;
+    margin-bottom: 10px;
+  }
   white-space: normal;
 `;
 
@@ -19,6 +25,11 @@ export const Description = styled.h2`
   @media (max-width: 700px) {
     font-size: 0.8rem;
     line-height: 1.2rem;
+  }
+  @media (min-width: 1750px) {
+    font-size: 1.5rem;
+    line-height: 2rem;
+    margin-bottom: 15px;
   }
 `;
 

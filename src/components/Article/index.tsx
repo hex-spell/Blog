@@ -16,13 +16,19 @@ const ArticleContainer = styled(Card)<{ inverted?: boolean }>`
 const ArticleImage = styled("img")`
   max-width: 300px;
   max-height: 300px;
+  image-rendering: crisp-edges;
   @media (max-width: 400px) {
     max-width: 100%;
+  }
+  @media (min-width: 1750px) {
+    max-width: 400px;
+    max-height: 400px;
   }
 `;
 
 const ArticleContent = styled("div")`
   display: flex;
+  flex-grow: 1;
   flex-direction: column;
   justify-content: space-between;
 `;
