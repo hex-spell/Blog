@@ -15,6 +15,7 @@ export const createPost = /* GraphQL */ `
       image
       createdAt
       updatedAt
+      owner
     }
   }
 `;
@@ -31,6 +32,7 @@ export const updatePost = /* GraphQL */ `
       image
       createdAt
       updatedAt
+      owner
     }
   }
 `;
@@ -47,6 +49,7 @@ export const deletePost = /* GraphQL */ `
       image
       createdAt
       updatedAt
+      owner
     }
   }
 `;

@@ -69,6 +69,7 @@ export type Post = {
   image?: string | null,
   createdAt: string,
   updatedAt: string,
+  owner?: string | null,
 };
 
 export type UpdatePostInput = {
@@ -131,6 +132,7 @@ export type CreatePostMutation = {
     image?: string | null,
     createdAt: string,
     updatedAt: string,
+    owner?: string | null,
   } | null,
 };
 
@@ -149,6 +151,7 @@ export type UpdatePostMutation = {
     image?: string | null,
     createdAt: string,
     updatedAt: string,
+    owner?: string | null,
   } | null,
 };
 
@@ -167,6 +170,7 @@ export type DeletePostMutation = {
     image?: string | null,
     createdAt: string,
     updatedAt: string,
+    owner?: string | null,
   } | null,
 };
 
@@ -184,6 +188,7 @@ export type GetPostQuery = {
     image?: string | null,
     createdAt: string,
     updatedAt: string,
+    owner?: string | null,
   } | null,
 };
 
@@ -205,9 +210,14 @@ export type ListPostsQuery = {
       image?: string | null,
       createdAt: string,
       updatedAt: string,
+      owner?: string | null,
     } | null >,
     nextToken?: string | null,
   } | null,
+};
+
+export type OnCreatePostSubscriptionVariables = {
+  owner?: string | null,
 };
 
 export type OnCreatePostSubscription = {
@@ -220,7 +230,12 @@ export type OnCreatePostSubscription = {
     image?: string | null,
     createdAt: string,
     updatedAt: string,
+    owner?: string | null,
   } | null,
+};
+
+export type OnUpdatePostSubscriptionVariables = {
+  owner?: string | null,
 };
 
 export type OnUpdatePostSubscription = {
@@ -233,7 +248,12 @@ export type OnUpdatePostSubscription = {
     image?: string | null,
     createdAt: string,
     updatedAt: string,
+    owner?: string | null,
   } | null,
+};
+
+export type OnDeletePostSubscriptionVariables = {
+  owner?: string | null,
 };
 
 export type OnDeletePostSubscription = {
@@ -246,5 +266,6 @@ export type OnDeletePostSubscription = {
     image?: string | null,
     createdAt: string,
     updatedAt: string,
+    owner?: string | null,
   } | null,
 };

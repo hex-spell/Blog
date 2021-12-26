@@ -1,10 +1,14 @@
 import React from "react";
-import { Main } from "pages";
+import { Admin, Main } from "pages";
+import { Routes, Route } from "react-router-dom";
 
 const App: React.FC = () => {
   return (
     <>
-      <Main />
+      <Routes>
+        <Route path="/" element={<Main />} />
+        <Route path="admin" element={<Admin />} />
+      </Routes>
     </>
   );
 };

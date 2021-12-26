@@ -12,6 +12,7 @@ export const getPost = /* GraphQL */ `
       image
       createdAt
       updatedAt
+      owner
     }
   }
 `;
@@ -30,6 +31,7 @@ export const listPosts = /* GraphQL */ `
         image
         createdAt
         updatedAt
+        owner
       }
       nextToken
     }

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ComponentPropsWithoutRef } from "react";
 import styled from "styled-components";
 
 const ContainerWrapper = styled.div`
@@ -18,10 +18,29 @@ const ContainerContent = styled.div`
   }
 `;
 
-export const Container: React.FC = ({ children }) => {
+
+export const Container: React.FC<ComponentPropsWithoutRef<"div">> = ({
+  children,
+  style,
+}) => {
   return (
     <ContainerWrapper>
-      <ContainerContent>{children}</ContainerContent>
+      <ContainerContent style={style}>{children}</ContainerContent>
     </ContainerWrapper>
   );
 };
+
+
+
+export const CenteredContainer: React.FC = ({ children }) => (
+  <Container
+    style={{
+      height: "90vh",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+    }}
+  >
+    {children}
+  </Container>
+);
