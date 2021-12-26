@@ -7,13 +7,11 @@ import { useState } from "react";
 // 1. type for intellisense
 export type PostWithoutContent = Pick<
   Post,
-  "title" | "id" | "description" | "createdAt" | "updatedAt"
+  "title" | "image" | "id" | "description" | "createdAt" | "updatedAt"
 >;
 
 // 2. query for graphql
-export const usePostsListWithoutContent = (
-  callbacks?: QueryCallbacks<PostWithoutContent>
-) =>
+export const usePostsListWithoutContent = () =>
   useListQuery<PostWithoutContent>(
     `{
     listPosts {
@@ -23,8 +21,11 @@ export const usePostsListWithoutContent = (
         id
         title
         updatedAt
+        image
       }
     }}
   `,
-    callbacks
+    {
+      s3Dirs: ["image"],
+    }
   );

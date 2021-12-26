@@ -1,30 +1,27 @@
-import { API, graphqlOperation } from "aws-amplify";
+import { rejects } from "assert";
+import { API, graphqlOperation, Storage } from "aws-amplify";
+import { clog } from "helpers";
 import { useEffect, useState } from "react";
-
-/**
- * accepts optional callbacks and returns states
- */
 
 export function useListQuery<Entity>(
   query: string,
-  callbacks?: Partial<QueryCallbacks<Entity>>,
-  deps?: React.DependencyList
+  config?: QueryHookConfig<Entity>
 ): QueryHookResponse<Entity> {
-  const { onEmpty, onSuccess, onFailure, onLoadFinished } = callbacks || {};
-
-  const [loading, setLoading] = useState<boolean>(true);
-
-  const [response, setResponse] = useState<Pick<
-    QueryHookResponse<Entity>,
-    "items" | "meta" | "error"
-  > | null>(null);
+  const [hookResponse, setResponse] = useState<QueryHookResponse<Entity>>({
+    loading: true,
+    error: "",
+    items: [],
+  });
 
   useEffect(() => {
     (async () => {
+      let response = hookResponse;
       try {
         const fetchedPosts = (await API.graphql(graphqlOperation(query))) as {
           data: ListQueryType<Entity>;
         };
+
+        clog(fetchedPosts, config?.logging);
 
         if (!fetchedPosts || !fetchedPosts.data) throw new Error("no data");
 
@@ -32,33 +29,52 @@ export function useListQuery<Entity>(
         const queryName = Object.keys(fetchedPosts.data)[0];
 
         if (!("items" in fetchedPosts.data[queryName]!)) {
-          onEmpty && onEmpty();
-          setResponse({ ...response, items: [], meta: null });
+          response = { ...response, items: [] };
           return;
         }
 
         const items = fetchedPosts.data[queryName]!.items as Entity[];
 
-        const { __typename, nextToken } = fetchedPosts.data[queryName]!;
+        response = { ...response, items };
 
-        console.log(fetchedPosts.data);
-
-        const meta = { __typename, nextToken };
-
-        onSuccess && onSuccess({ items, meta });
-
-        setResponse({ items, meta });
-      } catch {
-        onFailure && onFailure();
-        setResponse({
+        //change graphql field from s3 file dir to s3 link
+        if (config?.s3Dirs) {
+          const itemsStorageResolved: Promise<Entity>[] = items.map(
+            (item) =>
+              new Promise((resolve) => {
+                Promise.all(
+                  config!
+                    .s3Dirs!.filter((dir) => Boolean(item[dir]))
+                    .map(
+                      (key) =>
+                        new Promise((resolve) => {
+                          const dir = item[key] as unknown as string;
+                          Storage.get(dir).then((value) =>
+                            resolve([key, value])
+                          );
+                        })
+                    )
+                ).then((keyValuePairs: any) =>
+                  resolve({ ...item, ...Object.fromEntries(keyValuePairs) })
+                );
+              })
+          );
+          const resolved = await Promise.all(itemsStorageResolved);
+          response = { ...response, items: resolved };
+        }
+      } catch (err) {
+        response = {
+          ...response,
+          items: [],
           error: "unhandled exception in useListQuery",
-        });
+        };
+        clog(err, config?.logging);
       } finally {
-        onLoadFinished && onLoadFinished();
-        setLoading(false);
+        clog(response, config?.logging);
+        setResponse({ ...response, loading: false });
       }
     })();
-  }, deps || []);
+  }, config?.deps || []);
 
-  return { ...response, loading };
+  return hookResponse;
 }
