@@ -16,6 +16,7 @@ const ContainerContent = styled.div`
     max-width: 99%;
     min-width: unset;
   }
+  z-index: 2;
 `;
 
 
