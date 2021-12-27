@@ -52,7 +52,7 @@ export function useListQuery<Entity>(
         if (!fetchedPosts || !fetchedPosts.data) throw new Error("no data");
 
         //I should check if this is always true
-        const queryName = Object.keys(fetchedPosts.data)[0];
+        const queryName = Object.keys(fetchedPosts.data).filter((key)=>key!=="nextToken")[0];
 
         if (!("items" in fetchedPosts.data[queryName]!)) {
           response = { ...response, items: [] };

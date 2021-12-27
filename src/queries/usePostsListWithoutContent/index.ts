@@ -15,7 +15,7 @@ export const usePostsListWithoutContent = (
 ) =>
   useListQuery<PostWithoutContent>(
     `{
-    listPosts {
+      postsByDate(type: "Post", sortDirection: DESC) {
       items {
         createdAt
         description
