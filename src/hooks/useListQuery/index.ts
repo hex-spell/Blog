@@ -85,7 +85,7 @@ export function useListQuery<Entity>(
         setResponse({ ...response, loading: false });
       }
     })();
-  }, [...(deps || []), logging, s3Dirs, query]);
+  }, [query]);
 
   return hookResponse;
 }
